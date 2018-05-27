@@ -6,6 +6,7 @@ use Session;
 use Illuminate\Http\Request;
 use App\Category;
 use App\Post;
+use App\Tag;
 
 class PostsController extends Controller
 {
@@ -28,13 +29,15 @@ class PostsController extends Controller
     {
 
         $categories = Category::all();
+        $tags = Tag::all();
 
-        if($categories->count() == 0) {
-            Session::flash('info', 'You must have some categories before attempting to create a post');
+        if($categories->count() == 0 || $tags->count() == 0) {
+            Session::flash('info', 'You must have some categories and tags before attempting to create a post');
 
             return redirect()->back();
         }
-        return  view('admin.posts.create')->with('categories', $categories);
+        return  view('admin.posts.create')->with('categories', $categories)
+                                        ->with('tags', $tags);
     }
 
     /**
@@ -68,6 +71,10 @@ class PostsController extends Controller
             'slug' => str_slug($request->title)
         ]);
 
+        // Using the tags relationship defined in Post.php model
+        // And pass an array of ids we wanna associate with this post
+        $post->tags()->attach($request->tags);
+
         Session::flash('success', 'Post created successfully');
 
         return redirect()->back();
@@ -94,7 +101,10 @@ class PostsController extends Controller
     {
         $post = Post::find($id);
 
-        return view('admin.posts.edit')->with('post', $post)->with('categories', Category::all());
+        return view('admin.posts.edit')->with('post', $post)
+                                        ->with('categories', Category::all())
+                                        ->with('tags', Tag::all());
+
     }
 
     /**
@@ -133,6 +143,11 @@ class PostsController extends Controller
 
         // Update the record
         $post->save();
+
+        //Update the tags.
+        // This will first delete the old tags in the database for this post and call the
+        // attach method to attach new tags to the post
+        $post->tags()->sync($request->tags);
 
         Session::flash('success', 'Post updated successfully');
 
