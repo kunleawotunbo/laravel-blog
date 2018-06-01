@@ -19,7 +19,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    {{-- Import Toastr.css --}}
+     {{-- Import Toastr.css --}}
     <link rel="stylesheet" href="{{ asset('css/toastr.min.css')}}">
     
     @yield('styles')

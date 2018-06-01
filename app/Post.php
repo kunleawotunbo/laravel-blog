@@ -15,7 +15,7 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'content', 'category_id', 'featured', 'slug'
+        'title', 'content', 'category_id', 'featured', 'slug', 'user_id'
     ];
 
     protected $date = ['deleted_at'];
@@ -35,5 +35,9 @@ class Post extends Model
     // We can have multiple tags for a post
     public function tags(){
         return $this->belongsToMany('App\Tag');
+    }
+
+    public function user(){
+        return $this->belongsTo('App\User');
     }
 }
